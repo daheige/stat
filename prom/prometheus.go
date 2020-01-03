@@ -34,11 +34,17 @@ var (
 
 	// CacheMiss for cache miss
 	CacheMiss = New().WithCounter("go_cache_miss", []string{"name"})
+
+	// DBQuery for db query
+	DBQuery = New().WithSummary("go_db_query", []string{"method","name"}).
+			WithState("go_db_query_state", []string{"method", "name"}).
+			WithCounter("go_lib_client_code", []string{"method", "name"})
 )
 
 // Prom struct.
 type Prom struct {
 	timer   *prometheus.HistogramVec
+	timerSummary *prometheus.SummaryVec
 	counter *prometheus.CounterVec
 	state   *prometheus.GaugeVec
 }
@@ -61,6 +67,22 @@ func (p *Prom) WithTimer(name string, labels []string) *Prom {
 		}, labels)
 
 	prometheus.MustRegister(p.timer)
+	return p
+}
+
+// WithSummary with summary timer
+func (p *Prom) WithSummary(name string, labels []string) *Prom {
+	if p == nil || p.timerSummary != nil {
+		return p
+	}
+
+	p.timerSummary = prometheus.NewSummaryVec(
+		prometheus.SummaryOpts{
+			Name: name,
+			Help: name,
+		}, labels)
+
+	prometheus.MustRegister(p.timerSummary)
 	return p
 }
 

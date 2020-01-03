@@ -26,6 +26,9 @@ var (
 	Cache Stat = prom.LibClient
 	DB    Stat = prom.LibClient
 
+	// db query
+	DBQuery Stat = prom.DBQuery
+
 	// cache hit
 	CacheHit Stat = prom.CacheHit
 
