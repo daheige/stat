@@ -7,6 +7,7 @@ package stat
 
 import (
 	"github.com/daheige/stat/prom"
+	"time"
 )
 
 // Stat interface.
@@ -40,3 +41,21 @@ var (
 	RPCServer Stat = prom.RPCServer
 )
 
+// PromBeginTime prometheus start time.
+func PromBeginTime() time.Time{
+	return time.Now()
+}
+
+// PromTimeSub return end time - start time interval.
+func PromTimeSub(promTime time.Time) int64 {
+	t := time.Now().Sub(promTime).Microseconds() // time interval us
+	return t
+}
+
+// DBQueryEndTime db query end time - start time.
+func DBQueryEndTime(promTime time.Time,method string,name string){
+	t := PromTimeSub(promTime)
+
+	DBQuery.Timing(method,t,name)
+	DBQuery.State(method,t,name)
+}
