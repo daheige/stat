@@ -3,8 +3,6 @@ package stat
 import (
 	"database/sql"
 	"fmt"
-	_ "github.com/go-sql-driver/mysql"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"log"
 	"net/http"
 	"net/http/pprof"
@@ -12,9 +10,12 @@ import (
 	"os/signal"
 	"syscall"
 	"testing"
+
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-func TestStat(t *testing.T){
+func TestStat(t *testing.T) {
 	t.Log("test stat")
 
 	port := 6060
@@ -91,34 +92,34 @@ func testStat(w http.ResponseWriter, r *http.Request) {
 
 	getUser()
 
-	DBQueryEndTime(start,"user","user_info")
+	DBQueryEndTime(start, "user", "user_info")
 
 	w.Write([]byte(`ok`))
 }
 
 type user struct {
-	Id int64
+	Id   int64
 	Name string
 }
 
 // getUser get user info
-func getUser(){
+func getUser() {
 	// DSN data source string: username: password @ protocol (address: port) / database? Parameter = parameter value
-	db, err := sql.Open("mysql", "root:root@tcp(192.168.0.11:3306)/test?charset=utf8");
+	db, err := sql.Open("mysql", "root:root@tcp(192.168.0.11:3306)/test?charset=utf8")
 	if err != nil {
-		fmt.Println(err);
+		fmt.Println(err)
 	}
 
-	defer db.Close();
+	defer db.Close()
 
 	u := user{}
 
-	rows3 := db.QueryRow("select id,name from users where id = ?", 1);
+	rows3 := db.QueryRow("select id,name from users where id = ?", 1)
 
-	err = rows3.Scan(&u.Id,&u.Name)
-	log.Println("scan error: ",err)
+	err = rows3.Scan(&u.Id, &u.Name)
+	log.Println("scan error: ", err)
 
-	log.Println("user: ",u)
+	log.Println("user: ", u)
 }
 
 /**
@@ -164,4 +165,4 @@ go_db_query_count{method="user",name="user_info"} 4
 # HELP go_db_query_state go_db_query_state
 # TYPE go_db_query_state gauge
 go_db_query_state{method="user",name="user_info"} 6500
- */
+*/
